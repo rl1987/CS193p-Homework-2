@@ -11,5 +11,7 @@
 
 + (NSString *)descriptionOfProgram:(id)program;
 + (double)runProgram:(id)program;
++ (double)runProgram:(id)program 
+ usingVariableValues:(NSDictionary *)variableValues;
 
 @end

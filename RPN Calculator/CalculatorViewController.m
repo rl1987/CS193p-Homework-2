@@ -78,10 +78,12 @@
     if (self.history.count == kHistoryCapacity)
         [self.history removeObjectAtIndex:0];
     
-    [self.history addObject: self.display.text];
+    //[self.history addObject: self.display.text];
+    [self.history addObject: [NSNumber numberWithDouble:
+                              [self.display.text doubleValue]]];
     
-    self.auxillaryDisplay.text = [self.history componentsJoinedByString:@" "];
-
+    self.auxillaryDisplay.text = 
+            [CalculatorBrain descriptionOfProgram:self.history];
 }
 
 - (IBAction)clearPressed 
@@ -122,10 +124,8 @@
     
     [self.history addObject: sender.currentTitle];
     
-    self.auxillaryDisplay.text=[self.history componentsJoinedByString:@" "];
-    
     self.auxillaryDisplay.text = 
-    [[self.history componentsJoinedByString:@" "]stringByAppendingString:@" ="]; 
+            [CalculatorBrain descriptionOfProgram:self.history];
 }
 
 - (IBAction)backSpacePressed 
@@ -169,7 +169,7 @@
     [self.history addObject: sender.currentTitle];
     
     self.auxillaryDisplay.text = 
-    [[self.history componentsJoinedByString:@" "]stringByAppendingString:@" ="]; 
+            [CalculatorBrain descriptionOfProgram:self.history];
 }
 
 - (void)viewDidUnload 
