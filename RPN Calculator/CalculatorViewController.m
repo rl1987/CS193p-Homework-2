@@ -78,7 +78,6 @@
     if (self.history.count == kHistoryCapacity)
         [self.history removeObjectAtIndex:0];
     
-    //[self.history addObject: self.display.text];
     [self.history addObject: [NSNumber numberWithDouble:
                               [self.display.text doubleValue]]];
     

@@ -1,10 +1,11 @@
 #import "CalculatorBrain.h"
 
-@interface CalculatorBrain ()
+@interface CalculatorBrain () /* Private API */
 
 @property (nonatomic, strong) NSMutableArray *programStack;
 
-+ (NSString *)descriptionOfTopOfStack:(NSArray *)stack;
++ (NSString *)descriptionOfStack:(NSMutableArray *)stack;
++ (BOOL)isOperation:(id)stackElement;
 
 @end
 
@@ -25,57 +26,84 @@
     return [self.programStack copy];
 }
 
-+ (NSString *)descriptionOfTopOfStack:(NSArray *)stack
++ (BOOL)isOperation:(id)stackElement
 {
-    if (!stack.count)
-        return @"";
- 
-    NSSet *unaryOperations = [NSSet setWithObjects:@"sqrt",@"+/-",
-                                                   @"cos",@"sin", nil];
+    if ([stackElement isKindOfClass:[NSString class]] == NO)
+        return NO;
     
-    NSSet *twoOperandOperations = [NSSet setWithObjects:@"+",@"-",
-                                                        @"/",@"*", nil];
+    NSSet *operations = 
+    [NSSet setWithObjects:@"+",@"-",@"/",@"*",@"sqrt",@"+/-",@"cos",@"sin",nil];
     
-    NSSet *variableNames = [NSSet setWithObjects:@"a",@"b",@"x", nil];
-    
-    NSString *descriptionString;
+    if ([operations member:stackElement])
+        return YES;
+    else 
+        return NO;
+}
+
++ (NSString *)descriptionOfStack:(NSMutableArray *)stack
+{
+       
+    NSMutableString *description;
     
     id topOfStack = [stack lastObject];
-    
-    NSMutableArray *newStack = [NSMutableArray arrayWithArray:stack];
-    [newStack removeLastObject];
+    if (topOfStack) [stack removeLastObject];
     
     if ([topOfStack isKindOfClass:[NSNumber class]])
-        descriptionString = [NSString stringWithFormat:@"%g",
-                             [topOfStack doubleValue]];
-    else if ([topOfStack isKindOfClass:[NSString class]])
     {
-        if ([unaryOperations member:topOfStack])
-            descriptionString = [NSString stringWithFormat:@"%@(%@)",topOfStack,
-                                 [self descriptionOfTopOfStack:newStack]];
-        else if ([twoOperandOperations member:topOfStack])
-            descriptionString = [NSString stringWithFormat:@"(%@ %@ %@)",
-                                 [self descriptionOfTopOfStack:newStack],
-                                 topOfStack,
-                                 [self descriptionOfTopOfStack:
-                                  [newStack subarrayWithRange:
-                                   NSMakeRange(0, [newStack count] - 1)]]];
-        else if ([variableNames member:topOfStack])
-            descriptionString = [topOfStack copy];
+        description = [NSMutableString stringWithFormat:@"%g",
+                       [topOfStack doubleValue]];
+    }
+    else if ([self isOperation:topOfStack])
+    {
+        NSString *operation = topOfStack;
+        if ([operation isEqualToString:@"+"]) 
+            description = [NSMutableString stringWithFormat:@"(%@ + %@)",
+                           [self descriptionOfStack:stack],
+                           [self descriptionOfStack:stack]];
+        else if ([@"*" isEqualToString:operation]) 
+            description = [NSMutableString stringWithFormat:@"(%@ * %@)",
+                           [self descriptionOfStack:stack],
+                           [self descriptionOfStack:stack]];
+        else if ([operation isEqualToString:@"-"]) {
+            NSString *subtrahendDescription = [self descriptionOfStack:stack];
+            
+            description = [NSMutableString stringWithFormat:@"(%@ - %@)",
+                           [self descriptionOfStack:stack],
+                           subtrahendDescription];
+        } else if ([operation isEqualToString:@"/"]) {
+            NSString *divisorDescription = [self descriptionOfStack:stack];
+            
+            description = [NSMutableString stringWithFormat:@"(%@/%@)",
+                           [self descriptionOfStack:stack],
+                           divisorDescription];
+        } else if ([operation isEqualToString:@"sqrt"]) 
+            description = [NSMutableString stringWithFormat:@"sqrt(%@)",
+                           [self descriptionOfStack:stack]];
+        else if ([operation isEqualToString:@"sin"])
+            description = [NSMutableString stringWithFormat:@"sin(%@)",
+                           [self descriptionOfStack:stack]];
+        else if ([operation isEqualToString:@"cos"])
+            description = [NSMutableString stringWithFormat:@"cos(%@)",
+                           [self descriptionOfStack:stack]];
+        else if ([operation isEqualToString:@"pi"])
+            description = [NSMutableString stringWithString:@"pi"];
+        else if ([operation isEqualToString:@"+/-"])
+            description = [NSMutableString stringWithFormat:@"-(%@)",
+                           [self descriptionOfStack:stack]];
     }
     
-    return descriptionString;
+    return description;
+    
 }
 
 + (NSString *)descriptionOfProgram:(id)program
 {
+    NSMutableArray *stack;
     
-    if ([program isKindOfClass:[NSArray class]] == NO)
-        return @"";
+    if ([program isKindOfClass:[NSArray class]]) 
+        stack = [program mutableCopy];
     
-    NSString *descriptionString = [self descriptionOfTopOfStack:program];
-        
-    return descriptionString;
+    return [self descriptionOfStack:stack];
 }
 
 - (void)pushOperand:(double)operand
@@ -156,4 +184,3 @@
 }
 
 @end
-
