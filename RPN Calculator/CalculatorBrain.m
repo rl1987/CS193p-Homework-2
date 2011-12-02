@@ -40,13 +40,22 @@
         return NO;
 }
 
+// Program description string is built up recursively.
 + (NSString *)descriptionOfStack:(NSMutableArray *)stack
 {
-       
+    
     NSMutableString *description;
     
+    NSSet *oneOperandOperations = 
+    [NSSet setWithObjects:@"sqrt",@"sin",@"cos",@"+/-",nil];
+    
+    NSSet *twoOperandOperations = 
+    [NSSet setWithObjects:@"+",@"*",@"-",@"/",nil];
+    
     id topOfStack = [stack lastObject];
-    if (topOfStack) [stack removeLastObject];
+    
+    if (topOfStack) 
+        [stack removeLastObject];
     
     if ([topOfStack isKindOfClass:[NSNumber class]])
     {
@@ -55,42 +64,105 @@
     }
     else if ([self isOperation:topOfStack])
     {
-        NSString *operation = topOfStack;
-        if ([operation isEqualToString:@"+"]) 
-            description = [NSMutableString stringWithFormat:@"(%@ + %@)",
-                           [self descriptionOfStack:stack],
-                           [self descriptionOfStack:stack]];
-        else if ([@"*" isEqualToString:operation]) 
-            description = [NSMutableString stringWithFormat:@"(%@ * %@)",
-                           [self descriptionOfStack:stack],
-                           [self descriptionOfStack:stack]];
-        else if ([operation isEqualToString:@"-"]) {
-            NSString *subtrahendDescription = [self descriptionOfStack:stack];
-            
-            description = [NSMutableString stringWithFormat:@"(%@ - %@)",
-                           [self descriptionOfStack:stack],
-                           subtrahendDescription];
-        } else if ([operation isEqualToString:@"/"]) {
-            NSString *divisorDescription = [self descriptionOfStack:stack];
-            
-            description = [NSMutableString stringWithFormat:@"(%@/%@)",
-                           [self descriptionOfStack:stack],
-                           divisorDescription];
-        } else if ([operation isEqualToString:@"sqrt"]) 
-            description = [NSMutableString stringWithFormat:@"sqrt(%@)",
-                           [self descriptionOfStack:stack]];
-        else if ([operation isEqualToString:@"sin"])
-            description = [NSMutableString stringWithFormat:@"sin(%@)",
-                           [self descriptionOfStack:stack]];
-        else if ([operation isEqualToString:@"cos"])
-            description = [NSMutableString stringWithFormat:@"cos(%@)",
-                           [self descriptionOfStack:stack]];
-        else if ([operation isEqualToString:@"pi"])
+        if ([twoOperandOperations member:topOfStack])
+        {
+            if ([topOfStack isEqualToString:@"+"]) {
+                if ([twoOperandOperations member:[stack lastObject]]) {
+                    description = [NSMutableString stringWithFormat:@"(%@) + ",
+                                   [self descriptionOfStack:stack]];
+                } 
+                else { 
+                    description = [NSMutableString stringWithFormat:@"%@ + ",
+                                   [self descriptionOfStack:stack]];
+                }
+                
+                if ([twoOperandOperations member:[stack lastObject]]) {
+                    [description appendFormat:@"(%@)",
+                     [self descriptionOfStack:stack]];
+                }
+                else 
+                    [description appendString:[self descriptionOfStack:stack]];
+
+            } else if ([topOfStack isEqualToString:@"*"]) {
+                if ([twoOperandOperations member:[stack lastObject]]) {
+                    description = [NSMutableString stringWithFormat:@"(%@) * ",
+                                   [self descriptionOfStack:stack]];
+                } 
+                else { 
+                    description = [NSMutableString stringWithFormat:@"%@ * ",
+                                   [self descriptionOfStack:stack]];
+                }
+                
+                if ([twoOperandOperations member:[stack lastObject]]) {
+                    [description appendFormat:@"(%@)",
+                     [self descriptionOfStack:stack]];
+                }
+                else 
+                    [description appendString:[self descriptionOfStack:stack]];                
+            } else if ([topOfStack isEqualToString:@"-"]) {
+                NSString *subtrahendDescription;
+                
+                if ([twoOperandOperations member: [stack lastObject]])
+                    subtrahendDescription = 
+                    [NSString stringWithFormat:@"(%@)",
+                     [self descriptionOfStack:stack]];
+                else 
+                    subtrahendDescription=[self descriptionOfStack:stack];
+                
+                if ([twoOperandOperations member: [stack lastObject]]) {
+                    description = [NSMutableString stringWithFormat:@"(%@) - %@",
+                                   [self descriptionOfStack:stack],
+                                   subtrahendDescription];
+                } else {
+                    description = [NSMutableString stringWithFormat:@"%@ - %@",
+                                   [self descriptionOfStack:stack],
+                                   subtrahendDescription];
+                }
+                
+            } else if ([topOfStack isEqualToString:@"/"]) {
+                NSString *divisorDescription;
+                
+                if ([twoOperandOperations member: [stack lastObject]])
+                    divisorDescription = 
+                    [NSString stringWithFormat:@"(%@)",
+                     [self descriptionOfStack:stack]];
+                else 
+                    divisorDescription=[self descriptionOfStack:stack];
+                
+                if ([twoOperandOperations member: [stack lastObject]]) {
+                    description = [NSMutableString stringWithFormat:@"(%@) / %@",
+                                   [self descriptionOfStack:stack],
+                                   divisorDescription];
+                } else {
+                    description = [NSMutableString stringWithFormat:@"%@ / %@",
+                                   [self descriptionOfStack:stack],
+                                   divisorDescription];
+                }
+
+            } 
+        }
+        else if ([oneOperandOperations member:topOfStack])
+        {
+            if ([topOfStack isEqualToString:@"sqrt"]) {
+                description = [NSMutableString stringWithFormat:@"sqrt(%@)",
+                               [self descriptionOfStack:stack]];
+            } else if ([topOfStack isEqualToString:@"sin"]) {
+                description = [NSMutableString stringWithFormat:@"sin(%@)",
+                               [self descriptionOfStack:stack]];
+            } else if ([topOfStack isEqualToString:@"cos"]) {
+                description = [NSMutableString stringWithFormat:@"cos(%@)",
+                               [self descriptionOfStack:stack]];
+            } else if ([topOfStack isEqualToString:@"+/-"]) {
+                description = [NSMutableString stringWithFormat:@"-(%@)",
+                               [self descriptionOfStack:stack]];
+            }
+        } 
+        else if ([topOfStack isEqualToString:@"pi"])
             description = [NSMutableString stringWithString:@"pi"];
-        else if ([operation isEqualToString:@"+/-"])
-            description = [NSMutableString stringWithFormat:@"-(%@)",
-                           [self descriptionOfStack:stack]];
+        
     }
+    else 
+        description = [[NSMutableString alloc] initWithString:@""];
     
     return description;
     
@@ -127,7 +199,7 @@
 
 + (double)popOperandOffProgramStack:(NSMutableArray *)stack
 {
-    double result = 0;
+    double result = 0.0;
     
     id topOfStack = [stack lastObject];
     if (topOfStack) [stack removeLastObject];
