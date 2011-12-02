@@ -19,7 +19,7 @@
 @synthesize brain = _brain;
 @synthesize history = _history;
 
-#define kHistoryCapacity 10 // We're only allowing a limited number of history 
+#define kHistoryCapacity 64 // We're only allowing a limited number of history 
                             // items to be remembered.
 
 - (CalculatorBrain *)brain
