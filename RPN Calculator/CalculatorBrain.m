@@ -99,11 +99,19 @@
 + (NSString *)descriptionOfProgram:(id)program
 {
     NSMutableArray *stack;
+    NSMutableString *result = [[NSMutableString alloc] init];
     
     if ([program isKindOfClass:[NSArray class]]) 
         stack = [program mutableCopy];
+
+    do {
+        [result appendString:[self descriptionOfStack:stack]];
+        
+        if ([stack count])
+            [result appendString:@", "];
+    } while ([stack count]);
     
-    return [self descriptionOfStack:stack];
+    return result;
 }
 
 - (void)pushOperand:(double)operand
