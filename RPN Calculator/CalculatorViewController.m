@@ -7,6 +7,11 @@
 @property (nonatomic) BOOL userIsInTheMiddleOfTypingANumber;
 @property (nonatomic, strong) CalculatorBrain *brain;
 @property (nonatomic, strong) NSMutableArray *history;
+@property (nonatomic, strong) NSMutableDictionary *registers;
+
+#define DEBUG_DISPLAY_ENABLED 1
+
+- (void)refreshDebugDisplayIfNeeded;
 
 @end
 
@@ -14,10 +19,12 @@
 
 @synthesize display;
 @synthesize auxillaryDisplay;
+@synthesize debugDisplay;
 @synthesize userIsInTheMiddleOfTypingANumber;
 @synthesize userIsTypingFloatingPointNumber;
 @synthesize brain = _brain;
 @synthesize history = _history;
+@synthesize registers = _registers;
 
 #define kHistoryCapacity 64 // We're only allowing a limited number of history 
                             // items to be remembered.
@@ -37,6 +44,14 @@
     
     return _history;
         
+}
+
+- (NSMutableDictionary *)registers
+{
+    if (!_registers)
+        _registers = [[NSMutableDictionary alloc] init];
+    
+    return _registers;
 }
 
 - (IBAction)dotPressed 
@@ -96,6 +111,9 @@
     
     self.userIsTypingFloatingPointNumber = NO;
     self.userIsInTheMiddleOfTypingANumber = NO;
+        
+    [self.registers removeAllObjects];
+    self.debugDisplay.text = @"";
 }
 
 - (IBAction)plusMinusPressed:(UIButton *)sender
@@ -149,6 +167,32 @@
     }
 }
 
+- (void)refreshDebugDisplayIfNeeded
+{
+    if (DEBUG_DISPLAY_ENABLED)
+    {
+        NSArray *variablesNames = [self.registers allKeys];
+        NSMutableString *debugMessage = [[NSMutableString alloc] init];
+        
+        for (NSString *variable in variablesNames)
+            [debugMessage appendFormat:@"%@ = %g   ",
+              variable,[[self.registers objectForKey:variable] doubleValue]];
+        
+        self.debugDisplay.text = debugMessage;
+    }
+}
+
+- (IBAction)variablePressed:(UIButton *)sender 
+{
+    NSString *variableName = sender.currentTitle;
+    
+    [self.registers setObject:[NSNumber numberWithDouble:
+                              [self.display.text doubleValue]] 
+                       forKey:variableName];
+    
+    [self refreshDebugDisplayIfNeeded];
+}
+
 - (IBAction)operationPressed:(UIButton *)sender 
 {
     if (self.userIsInTheMiddleOfTypingANumber)
@@ -174,6 +218,7 @@
 - (void)viewDidUnload 
 {
     [self setAuxillaryDisplay:nil];
+    [self setDebugDisplay:nil];
     [super viewDidUnload];
 }
 

@@ -6,7 +6,7 @@
 
 + (NSString *)descriptionOfStack:(NSMutableArray *)stack;
 + (BOOL)isOperation:(id)stackElement;
-
+ 
 @end
 
 @implementation CalculatorBrain
