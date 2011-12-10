@@ -255,7 +255,28 @@
 + (double)runProgram:(id)program 
  usingVariableValues:(NSDictionary *)variableValues
 {
-    return (double)0.0;
+    NSMutableArray *programWithNumbers = [program mutableCopy];
+    
+    if ([variableValues objectForKey:@"a"])
+        for (int i=0; i<[programWithNumbers count]; i++)
+            if ([[programWithNumbers objectAtIndex:i] isEqualToString:@"a"])
+                [programWithNumbers replaceObjectAtIndex:i withObject:
+                 [variableValues objectForKey:@"a"]];
+    
+    if ([variableValues objectForKey:@"b"])
+        for (int i=0; i<[programWithNumbers count]; i++)
+            if ([[programWithNumbers objectAtIndex:i] isEqualToString:@"b"])
+                [programWithNumbers replaceObjectAtIndex:i withObject:
+                 [variableValues objectForKey:@"b"]];
+    
+    if ([variableValues objectForKey:@"x"])
+        for (int i=0; i<[programWithNumbers count]; i++)
+            if ([[programWithNumbers objectAtIndex:i] isEqualToString:@"x"])
+                [programWithNumbers replaceObjectAtIndex:i withObject:
+                 [variableValues objectForKey:@"x"]];
+    
+    return [self runProgram:programWithNumbers];
+    
 }
 
 - (void)restart
