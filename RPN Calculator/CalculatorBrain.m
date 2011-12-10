@@ -52,6 +52,8 @@
     NSSet *twoOperandOperations = 
     [NSSet setWithObjects:@"+",@"*",@"-",@"/",nil];
     
+    NSSet *variableNames = [NSSet setWithObjects:@"a",@"b",@"x", nil];
+    
     id topOfStack = [stack lastObject];
     
     if (topOfStack) 
@@ -161,6 +163,8 @@
             description = [NSMutableString stringWithString:@"pi"];
         
     }
+    else if ([variableNames member:topOfStack])
+        description = [topOfStack copy];
     else 
         description = [[NSMutableString alloc] initWithString:@""];
     

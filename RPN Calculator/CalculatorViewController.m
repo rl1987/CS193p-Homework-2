@@ -186,11 +186,19 @@
 {
     NSString *variableName = sender.currentTitle;
     
-    [self.registers setObject:[NSNumber numberWithDouble:
-                              [self.display.text doubleValue]] 
-                       forKey:variableName];
+//    [self.registers setObject:[NSNumber numberWithDouble:
+//                              [self.display.text doubleValue]] 
+//                       forKey:variableName];
     
-    [self refreshDebugDisplayIfNeeded];
+    if (self.history.count == kHistoryCapacity)
+        [self.history removeObjectAtIndex:0];
+    
+    [self.history addObject: variableName];
+    
+    self.auxillaryDisplay.text = 
+        [CalculatorBrain descriptionOfProgram:self.history];
+    
+//    [self refreshDebugDisplayIfNeeded];
 }
 
 - (IBAction)operationPressed:(UIButton *)sender 
