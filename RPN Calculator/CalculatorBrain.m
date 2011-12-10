@@ -257,26 +257,29 @@
 {
     NSMutableArray *programWithNumbers = [program mutableCopy];
     
-    if ([variableValues objectForKey:@"a"])
-        for (int i=0; i<[programWithNumbers count]; i++)
-            if ([[programWithNumbers objectAtIndex:i] isEqualToString:@"a"])
-                [programWithNumbers replaceObjectAtIndex:i withObject:
-                 [variableValues objectForKey:@"a"]];
+    NSSet *variablesInProgram = [self variablesUsedInProgram:program];
     
-    if ([variableValues objectForKey:@"b"])
-        for (int i=0; i<[programWithNumbers count]; i++)
-            if ([[programWithNumbers objectAtIndex:i] isEqualToString:@"b"])
-                [programWithNumbers replaceObjectAtIndex:i withObject:
-                 [variableValues objectForKey:@"b"]];
-    
-    if ([variableValues objectForKey:@"x"])
-        for (int i=0; i<[programWithNumbers count]; i++)
-            if ([[programWithNumbers objectAtIndex:i] isEqualToString:@"x"])
-                [programWithNumbers replaceObjectAtIndex:i withObject:
-                 [variableValues objectForKey:@"x"]];
+    for (id v in variablesInProgram)
+        if ([variableValues objectForKey:v])
+            for (int i=0; i<[programWithNumbers count]; i++)
+                if ([[programWithNumbers objectAtIndex:i] isEqualToString:v])
+                    [programWithNumbers replaceObjectAtIndex:i withObject:
+                     [variableValues objectForKey:v]];
     
     return [self runProgram:programWithNumbers];
     
+}
+
++ (NSSet *)variablesUsedInProgram:(id)program
+{
+    NSSet *variableNames = [NSMutableSet setWithObjects:@"a",@"b",@"x", nil];
+    NSMutableSet *result = [[NSMutableSet alloc] init];
+    
+    for (id v in variableNames)
+        if ([(NSArray *)program indexOfObjectIdenticalTo:v] != NSNotFound)
+            [result addObject:v];            
+    
+    return [result copy];
 }
 
 - (void)restart
