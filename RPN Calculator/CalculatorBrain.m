@@ -52,7 +52,7 @@
     NSSet *twoOperandOperations = 
     [NSSet setWithObjects:@"+",@"*",@"-",@"/",nil];
     
-    NSSet *variableNames = [NSSet setWithObjects:@"a",@"b",@"x", nil];
+    NSSet *variableNames = [NSSet setWithObjects:@"a",@"b",@"c", nil];
     
     id topOfStack = [stack lastObject];
     
@@ -276,7 +276,7 @@
 
 + (NSSet *)variablesUsedInProgram:(id)program
 {
-    NSSet *variableNames = [NSMutableSet setWithObjects:@"a",@"b",@"x", nil];
+    NSSet *variableNames = [NSMutableSet setWithObjects:@"a",@"b",@"c", nil];
     NSMutableSet *result = [[NSMutableSet alloc] init];
     
     for (id v in variableNames)

@@ -7,7 +7,6 @@
 @property (nonatomic) BOOL userIsInTheMiddleOfTypingANumber;
 @property (nonatomic, strong) CalculatorBrain *brain;
 @property (nonatomic, strong) NSMutableArray *history;
-@property (nonatomic, strong) NSMutableDictionary *registers;
 
 #define DEBUG_DISPLAY_ENABLED 1
 
@@ -24,7 +23,7 @@
 @synthesize userIsTypingFloatingPointNumber;
 @synthesize brain = _brain;
 @synthesize history = _history;
-@synthesize registers = _registers;
+@synthesize testVariableValues = _testVariableValues;
 
 #define kHistoryCapacity 64 // We're only allowing a limited number of history 
                             // items to be remembered.
@@ -46,12 +45,12 @@
         
 }
 
-- (NSMutableDictionary *)registers
+- (NSMutableDictionary *)testVariableValues
 {
-    if (!_registers)
-        _registers = [[NSMutableDictionary alloc] init];
+    if (!_testVariableValues)
+        _testVariableValues = [[NSMutableDictionary alloc] init];
     
-    return _registers;
+    return _testVariableValues;
 }
 
 - (IBAction)dotPressed 
@@ -112,7 +111,7 @@
     self.userIsTypingFloatingPointNumber = NO;
     self.userIsInTheMiddleOfTypingANumber = NO;
         
-    [self.registers removeAllObjects];
+    [self.testVariableValues removeAllObjects];
     self.debugDisplay.text = @"";
 }
 
@@ -171,12 +170,13 @@
 {
     if (DEBUG_DISPLAY_ENABLED)
     {
-        NSArray *variablesNames = [self.registers allKeys];
+        NSArray *variablesNames = [self.testVariableValues allKeys];
         NSMutableString *debugMessage = [[NSMutableString alloc] init];
         
         for (NSString *variable in variablesNames)
             [debugMessage appendFormat:@"%@ = %g   ",
-              variable,[[self.registers objectForKey:variable] doubleValue]];
+              variable,[[self.testVariableValues objectForKey:variable] 
+                        doubleValue]];
         
         self.debugDisplay.text = debugMessage;
     }
@@ -186,10 +186,6 @@
 {
     NSString *variableName = sender.currentTitle;
     
-//    [self.registers setObject:[NSNumber numberWithDouble:
-//                              [self.display.text doubleValue]] 
-//                       forKey:variableName];
-    
     if (self.history.count == kHistoryCapacity)
         [self.history removeObjectAtIndex:0];
     
@@ -198,7 +194,6 @@
     self.auxillaryDisplay.text = 
         [CalculatorBrain descriptionOfProgram:self.history];
     
-//    [self refreshDebugDisplayIfNeeded];
 }
 
 - (IBAction)operationPressed:(UIButton *)sender 
@@ -223,10 +218,71 @@
             [CalculatorBrain descriptionOfProgram:self.history];
 }
 
+- (IBAction)test1Pressed 
+{
+    [self.testVariableValues setObject:[NSNumber numberWithInt:1]
+                                forKey:@"a"];
+    
+    [self.testVariableValues setObject:[NSNumber numberWithInt:2]
+                                forKey:@"b"]; 
+    
+    [self.testVariableValues setObject:[NSNumber numberWithInt:3]
+                                forKey:@"c"]; 
+    
+    double result = [CalculatorBrain runProgram:self.history 
+                            usingVariableValues:self.testVariableValues];
+    
+    self.display.text = [NSString stringWithFormat:@"%g",result];
+    
+    [self refreshDebugDisplayIfNeeded];
+}
+
+- (IBAction)test2Pressed 
+{
+    
+    [self.testVariableValues setObject:[NSNumber numberWithInt:0]
+                                forKey:@"a"];
+    
+    [self.testVariableValues setObject:[NSNumber numberWithInt:0]
+                                forKey:@"b"]; 
+
+    [self.testVariableValues setObject:[NSNumber numberWithInt:0]
+                                forKey:@"c"]; 
+        
+    double result = [CalculatorBrain runProgram:self.history 
+                            usingVariableValues:self.testVariableValues];
+    
+    self.display.text = [NSString stringWithFormat:@"%g",result];
+    
+    [self refreshDebugDisplayIfNeeded];    
+    
+}
+
+- (IBAction)test3Pressed 
+{
+    [self.testVariableValues setObject:[NSNumber numberWithLong:NSUIntegerMax]
+                                forKey:@"a"];
+    
+    [self.testVariableValues setObject:[NSNumber numberWithLong:NSUIntegerMax]
+                                forKey:@"b"]; 
+    
+    [self.testVariableValues setObject:[NSNumber numberWithLong:NSUIntegerMax]
+                                forKey:@"c"]; 
+    
+    double result = [CalculatorBrain runProgram:self.history 
+                            usingVariableValues:self.testVariableValues];
+    
+    self.display.text = [NSString stringWithFormat:@"%g",result];
+    
+    [self refreshDebugDisplayIfNeeded];
+
+}
+
 - (void)viewDidUnload 
 {
     [self setAuxillaryDisplay:nil];
     [self setDebugDisplay:nil];
+    
     [super viewDidUnload];
 }
 

@@ -6,4 +6,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *auxillaryDisplay;
 @property (weak, nonatomic) IBOutlet UILabel *debugDisplay;
 
+@property (strong, nonatomic) NSMutableDictionary *testVariableValues;
+
 @end
