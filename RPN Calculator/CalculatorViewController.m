@@ -260,14 +260,8 @@
 
 - (IBAction)test3Pressed 
 {
-    [self.testVariableValues setObject:[NSNumber numberWithLong:NSUIntegerMax]
-                                forKey:@"a"];
     
-    [self.testVariableValues setObject:[NSNumber numberWithLong:NSUIntegerMax]
-                                forKey:@"b"]; 
-    
-    [self.testVariableValues setObject:[NSNumber numberWithLong:NSUIntegerMax]
-                                forKey:@"c"]; 
+    self.testVariableValues = nil;
     
     double result = [CalculatorBrain runProgram:self.history 
                             usingVariableValues:self.testVariableValues];
