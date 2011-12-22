@@ -220,31 +220,31 @@
 + (double)runProgram:(id)program 
  usingVariableValues:(NSDictionary *)variableValues
 {
+    
+    if ((program == nil) || (variableValues == nil))
+        return 0.0;
+    
+    NSSet *variableNames = [NSSet setWithObjects:@"a",@"b",@"c", nil];
+    
     NSMutableArray *programWithNumbers = [program mutableCopy];
     
-    NSSet *variablesInProgram = [self variablesUsedInProgram:program];
-    
-    for (id v in variablesInProgram)
-        if ([variableValues objectForKey:v])
-            for (int i=0; i<[programWithNumbers count]; i++)
-                if ([[programWithNumbers objectAtIndex:i] isEqualToString:v])
-                    [programWithNumbers replaceObjectAtIndex:i withObject:
-                     [variableValues objectForKey:v]];
-    
+    for (short int i=0; i<[programWithNumbers count]; i++)
+    {
+        id elementInQuestion = [[programWithNumbers objectAtIndex:i] copy];
+        
+        if ([variableNames member:elementInQuestion])
+        {
+            NSNumber *value = [variableValues objectForKey:elementInQuestion];
+            
+            if (value != nil)
+                [programWithNumbers replaceObjectAtIndex:i 
+                                              withObject:value];
+        }
+                                                                   
+    }
+       
     return [self runProgram:programWithNumbers];
     
-}
-
-+ (NSSet *)variablesUsedInProgram:(id)program
-{
-    NSSet *variableNames = [NSMutableSet setWithObjects:@"a",@"b",@"c", nil];
-    NSMutableSet *result = [[NSMutableSet alloc] init];
-    
-    for (id v in variableNames)
-        if ([(NSArray *)program indexOfObjectIdenticalTo:v] != NSNotFound)
-            [result addObject:v];            
-    
-    return [result copy];
 }
 
 - (void)restart
