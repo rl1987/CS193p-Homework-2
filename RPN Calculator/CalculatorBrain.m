@@ -224,7 +224,7 @@
     if ((program == nil) || (variableValues == nil))
         return 0.0;
     
-    NSSet *variableNames = [NSSet setWithObjects:@"a",@"b",@"c", nil];
+    NSSet *usedVariables = [self variablesUsedInProgram:program];
     
     NSMutableArray *programWithNumbers = [program mutableCopy];
     
@@ -232,19 +232,34 @@
     {
         id elementInQuestion = [[programWithNumbers objectAtIndex:i] copy];
         
-        if ([variableNames member:elementInQuestion])
+        if ([usedVariables member:elementInQuestion])
         {
             NSNumber *value = [variableValues objectForKey:elementInQuestion];
             
-            if (value != nil)
-                [programWithNumbers replaceObjectAtIndex:i 
-                                              withObject:value];
+            if (value == nil)
+                value = [NSNumber numberWithInt:0];
+            
+            [programWithNumbers replaceObjectAtIndex:i 
+                                          withObject:value];
         }
                                                                    
     }
        
     return [self runProgram:programWithNumbers];
     
+}
+
++ (NSSet *)variablesUsedInProgram:(id)program
+{
+   
+    NSSet *variableNames = [NSMutableSet setWithObjects:@"a",@"b",@"c",nil];
+    NSMutableSet *result = [[NSMutableSet alloc] init];
+    
+    for (short int i=0; i<[program count]; i++)
+        if ([variableNames member:[program objectAtIndex:i]])
+            [result addObject:[program objectAtIndex:i]];
+        
+    return [result copy];
 }
 
 - (void)restart
