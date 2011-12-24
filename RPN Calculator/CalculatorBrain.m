@@ -89,26 +89,27 @@
             } else if ([topOfStack isEqualToString:@"-"] || 
                        [topOfStack isEqualToString:@"/"]) 
             {
+                NSString *firstArgumentDescription;
                 NSString *secondArgumentDescription;
                 
                 if ([twoOperandOperations member: [stack lastObject]])
-                    secondArgumentDescription = 
-                    [NSString stringWithFormat:@"(%@)",
-                     [self descriptionOfStack:stack]];
-                else 
-                    secondArgumentDescription=[self descriptionOfStack:stack];
+                    secondArgumentDescription = [NSString stringWithFormat:@"(%@)",
+                                                 [self descriptionOfStack:stack]];
+                else
+                    secondArgumentDescription = [NSString stringWithFormat:@"%@",
+                                                 [self descriptionOfStack:stack]];                    
                 
-                if ([twoOperandOperations member: [stack lastObject]]) {
-                    description = [NSMutableString stringWithFormat:@"(%@) %@ %@",
-                                   [self descriptionOfStack:stack],
-                                   topOfStack,
-                                   secondArgumentDescription];
-                } else {
-                    description = [NSMutableString stringWithFormat:@"%@ - %@",
-                                   [self descriptionOfStack:stack],
-                                   topOfStack,
-                                   secondArgumentDescription];
-                }
+                if ([twoOperandOperations member: [stack lastObject]])
+                    firstArgumentDescription = [NSString stringWithFormat:@"(%@)",
+                                                [self descriptionOfStack:stack]];
+                else
+                    firstArgumentDescription = [NSString stringWithFormat:@"%@",
+                                                [self descriptionOfStack:stack]];
+                
+                description = [NSString stringWithFormat:@"%@ %@ %@",
+                               firstArgumentDescription,topOfStack,
+                               secondArgumentDescription];
+
             } 
         }
         else if ([oneOperandOperations member:topOfStack])
