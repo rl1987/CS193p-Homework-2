@@ -117,20 +117,9 @@
 
 - (IBAction)plusMinusPressed:(UIButton *)sender
 {
-    if (self.userIsInTheMiddleOfTypingANumber)
-    {
-        if ([self.display.text hasPrefix:@"-"])
-            self.display.text = [self.display.text substringFromIndex:1];
-        else
-            self.display.text = 
-            [NSString stringWithFormat:@"-%@",self.display.text];
-        
-        return;
-    }
     
-    double result = [self.brain performOperation:sender.currentTitle];
-    
-    self.display.text = [NSString stringWithFormat:@"%g",result];
+    self.userIsInTheMiddleOfTypingANumber = NO;
+    self.userIsTypingFloatingPointNumber = NO;
     
     NSAssert(self.history.count <= kHistoryCapacity,
              @"ERROR: Too much history elements");
@@ -139,6 +128,10 @@
         [self.history removeObjectAtIndex:0];
     
     [self.history addObject: sender.currentTitle];
+    
+    double result = [CalculatorBrain runProgram:self.history];
+    
+    self.display.text = [NSString stringWithFormat:@"%g",result];
     
     self.auxillaryDisplay.text = 
             [CalculatorBrain descriptionOfProgram:self.history];
@@ -202,7 +195,9 @@
         [self enterPressed];
     
     NSString *operation = [sender currentTitle];
-    double result = [self.brain performOperation:operation];
+    
+    [self.history addObject:operation];
+    double result = [CalculatorBrain runProgram:self.history];
     
     self.display.text = [NSString stringWithFormat:@"%g",result];
     
@@ -211,9 +206,7 @@
     
     if (self.history.count == kHistoryCapacity)
         [self.history removeObjectAtIndex:0];
-    
-    [self.history addObject: sender.currentTitle];
-    
+        
     self.auxillaryDisplay.text = 
             [CalculatorBrain descriptionOfProgram:self.history];
 }
@@ -270,6 +263,25 @@
     
     [self refreshDebugDisplayIfNeeded];
 
+}
+
+- (IBAction)undoPressed
+{
+    
+    if (self.userIsInTheMiddleOfTypingANumber)
+    {
+        [self backSpacePressed];
+        return;
+    }
+    
+    if ([self.history lastObject])
+        [self.history removeLastObject];
+    
+    self.display.text = [NSString stringWithFormat:@"%g",
+                            [CalculatorBrain runProgram:self.history]];
+    
+    self.auxillaryDisplay.text = 
+        [CalculatorBrain descriptionOfProgram:self.history];
 }
 
 - (void)viewDidUnload 
