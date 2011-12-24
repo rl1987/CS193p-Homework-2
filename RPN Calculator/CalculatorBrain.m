@@ -32,7 +32,8 @@
         return NO;
     
     NSSet *operations = 
-    [NSSet setWithObjects:@"+",@"-",@"/",@"*",@"sqrt",@"+/-",@"cos",@"sin",nil];
+    [NSSet setWithObjects:@"+",@"-",@"/",@"*",@"sqrt",@"+/-",@"cos",@"sin",
+                            @"pi",nil];
     
     if ([operations member:stackElement])
         return YES;
