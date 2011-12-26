@@ -238,14 +238,14 @@
             id arg1 = [self popOperandOffProgramStack:stack];
             
             if ([arg1 isKindOfClass:[NSNumber class]])
-                dividend = [arg1 doubleValue];
+                divisor = [arg1 doubleValue];
             else
                 return arg1;
             
             id arg2 = [self popOperandOffProgramStack:stack];
             
             if ([arg2 isKindOfClass:[NSNumber class]])
-                divisor = [arg2 doubleValue];
+                dividend = [arg2 doubleValue];
             else
                 return arg2;            
             
@@ -315,6 +315,9 @@
     if ([program isKindOfClass:[NSArray class]]) 
         stack = [program mutableCopy];
         
+    if ([[[self variablesUsedInProgram:stack] allObjects] count])
+        return [NSNumber numberWithInt:0];
+    
     id result = [self popOperandOffProgramStack:stack];
     
     if (result)

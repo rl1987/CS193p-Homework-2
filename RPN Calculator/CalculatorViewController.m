@@ -251,7 +251,8 @@
     [self.testVariableValues setObject:[NSNumber numberWithInt:3]
                                 forKey:@"c"]; 
     
-    id result = [CalculatorBrain runProgram:self.history];
+    id result = [CalculatorBrain runProgram:self.history 
+                        usingVariableValues: self.testVariableValues];
     
     if ([result isKindOfClass:[NSNumber class]])
         self.display.text = [NSString stringWithFormat:@"%g",
@@ -284,8 +285,9 @@
     [self.testVariableValues setObject:[NSNumber numberWithInt:0]
                                 forKey:@"c"]; 
         
-    id result = [CalculatorBrain runProgram:self.history];
-    
+    id result = [CalculatorBrain runProgram:self.history 
+                        usingVariableValues:self.testVariableValues];
+        
     if ([result isKindOfClass:[NSNumber class]])
         self.display.text = [NSString stringWithFormat:@"%g",
                              [result doubleValue]];
@@ -311,7 +313,8 @@
     
     self.testVariableValues = nil;
     
-    id result = [CalculatorBrain runProgram:self.history];
+    id result = [CalculatorBrain runProgram:self.history 
+                        usingVariableValues:self.testVariableValues];
     
     if ([result isKindOfClass:[NSNumber class]])
         self.display.text = [NSString stringWithFormat:@"%g",
