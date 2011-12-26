@@ -129,9 +129,23 @@
     
     [self.history addObject: sender.currentTitle];
     
-    double result = [CalculatorBrain runProgram:self.history];
+    id result = [CalculatorBrain runProgram:self.history];
     
-    self.display.text = [NSString stringWithFormat:@"%g",result];
+    if ([result isKindOfClass:[NSNumber class]])
+        self.display.text = [NSString stringWithFormat:@"%g",
+                             [result doubleValue]];
+    else
+    {
+        UIAlertView *errorPopup = [[UIAlertView alloc] initWithTitle:@"ERROR" 
+                                                             message:result 
+                                                            delegate:nil 
+                                                   cancelButtonTitle:@"Cancel" 
+                                                   otherButtonTitles:nil];
+        
+        [errorPopup show];
+        
+        return;
+    }
     
     self.auxillaryDisplay.text = 
             [CalculatorBrain descriptionOfProgram:self.history];
@@ -197,16 +211,31 @@
     NSString *operation = [sender currentTitle];
     
     [self.history addObject:operation];
-    double result = [CalculatorBrain runProgram:self.history];
-    
-    self.display.text = [NSString stringWithFormat:@"%g",result];
     
     NSAssert(self.history.count <= kHistoryCapacity,
              @"ERROR: Too much history elements");
     
     if (self.history.count == kHistoryCapacity)
         [self.history removeObjectAtIndex:0];
+    
+    id result = [CalculatorBrain runProgram:self.history];
+    
+    if ([result isKindOfClass:[NSNumber class]])
+        self.display.text = [NSString stringWithFormat:@"%g",
+                             [result doubleValue]];
+    else
+    {
+        UIAlertView *errorPopup = [[UIAlertView alloc] initWithTitle:@"ERROR" 
+                                                             message:result 
+                                                            delegate:nil 
+                                                   cancelButtonTitle:@"Cancel" 
+                                                   otherButtonTitles:nil];
         
+        [errorPopup show];
+        
+        return;
+    }
+            
     self.auxillaryDisplay.text = 
             [CalculatorBrain descriptionOfProgram:self.history];
 }
@@ -222,10 +251,23 @@
     [self.testVariableValues setObject:[NSNumber numberWithInt:3]
                                 forKey:@"c"]; 
     
-    double result = [CalculatorBrain runProgram:self.history 
-                            usingVariableValues:self.testVariableValues];
+    id result = [CalculatorBrain runProgram:self.history];
     
-    self.display.text = [NSString stringWithFormat:@"%g",result];
+    if ([result isKindOfClass:[NSNumber class]])
+        self.display.text = [NSString stringWithFormat:@"%g",
+                             [result doubleValue]];
+    else
+    {
+        UIAlertView *errorPopup = [[UIAlertView alloc] initWithTitle:@"ERROR" 
+                                                             message:result 
+                                                            delegate:nil 
+                                                   cancelButtonTitle:@"Cancel" 
+                                                   otherButtonTitles:nil];
+        
+        [errorPopup show];
+        
+        return;
+    }
     
     [self refreshDebugDisplayIfNeeded];
 }
@@ -242,10 +284,23 @@
     [self.testVariableValues setObject:[NSNumber numberWithInt:0]
                                 forKey:@"c"]; 
         
-    double result = [CalculatorBrain runProgram:self.history 
-                            usingVariableValues:self.testVariableValues];
+    id result = [CalculatorBrain runProgram:self.history];
     
-    self.display.text = [NSString stringWithFormat:@"%g",result];
+    if ([result isKindOfClass:[NSNumber class]])
+        self.display.text = [NSString stringWithFormat:@"%g",
+                             [result doubleValue]];
+    else
+    {
+        UIAlertView *errorPopup = [[UIAlertView alloc] initWithTitle:@"ERROR" 
+                                                             message:result 
+                                                            delegate:nil 
+                                                   cancelButtonTitle:@"Cancel" 
+                                                   otherButtonTitles:nil];
+        
+        [errorPopup show];
+        
+        return;
+    }
     
     [self refreshDebugDisplayIfNeeded];    
     
@@ -256,10 +311,23 @@
     
     self.testVariableValues = nil;
     
-    double result = [CalculatorBrain runProgram:self.history 
-                            usingVariableValues:self.testVariableValues];
+    id result = [CalculatorBrain runProgram:self.history];
     
-    self.display.text = [NSString stringWithFormat:@"%g",result];
+    if ([result isKindOfClass:[NSNumber class]])
+        self.display.text = [NSString stringWithFormat:@"%g",
+                             [result doubleValue]];
+    else
+    {
+        UIAlertView *errorPopup = [[UIAlertView alloc] initWithTitle:@"ERROR" 
+                                                             message:result 
+                                                            delegate:nil 
+                                                   cancelButtonTitle:@"Cancel" 
+                                                   otherButtonTitles:nil];
+        
+        [errorPopup show];
+        
+        return;
+    }
     
     [self refreshDebugDisplayIfNeeded];
 

@@ -158,73 +158,180 @@
     [self.programStack addObject:[NSNumber numberWithDouble:operand]];
 }
 
-- (double)performOperation:(NSString *)operation
+- (id)performOperation:(NSString *)operation
 {
     [self.programStack addObject:operation];
     return [[self class] runProgram:self.program];
 }
 
-+ (double)popOperandOffProgramStack:(NSMutableArray *)stack
++ (id)popOperandOffProgramStack:(NSMutableArray *)stack
 {
-    double result = 0.0;
+    id result;
     
     id topOfStack = [stack lastObject];
     if (topOfStack) [stack removeLastObject];
     
     if ([topOfStack isKindOfClass:[NSNumber class]])
     {
-        result = [topOfStack doubleValue];
+        result = topOfStack;
     }
     else if ([topOfStack isKindOfClass:[NSString class]])
     {
         NSString *operation = topOfStack;
         if ([operation isEqualToString:@"+"]) {
-            result = [self popOperandOffProgramStack:stack] +
-            [self popOperandOffProgramStack:stack];
+            double component1,component2;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                component1 = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            id arg2 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg2 isKindOfClass:[NSNumber class]])
+                component2 = [arg2 doubleValue];
+            else
+                return arg2;
+            
+            result = [NSNumber numberWithDouble:component1+component2];
         } else if ([@"*" isEqualToString:operation]) {
-            result = [self popOperandOffProgramStack:stack] *
-            [self popOperandOffProgramStack:stack];
+            double factor1,factor2;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                factor1 = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            id arg2 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg2 isKindOfClass:[NSNumber class]])
+                factor2 = [arg2 doubleValue];
+            else
+                return arg2;    
+            
+            result = [NSNumber numberWithDouble:factor1*factor2];
         } else if ([operation isEqualToString:@"-"]) {
-            double subtrahend = [self popOperandOffProgramStack:stack];
-            result = [self popOperandOffProgramStack:stack] - subtrahend;
+            double subtrahend,minuend;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                subtrahend = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            id arg2 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg2 isKindOfClass:[NSNumber class]])
+                minuend = [arg2 doubleValue];
+            else
+                return arg2;
+
+            result = [NSNumber numberWithDouble:minuend - subtrahend];
         } else if ([operation isEqualToString:@"/"]) {
-            double divisor = [self popOperandOffProgramStack:stack];
+            double dividend,divisor;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                dividend = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            id arg2 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg2 isKindOfClass:[NSNumber class]])
+                divisor = [arg2 doubleValue];
+            else
+                return arg2;            
+            
             if (divisor) 
-                result = [self popOperandOffProgramStack:stack] / divisor;
+                result = [NSNumber numberWithDouble:dividend/divisor];
+            else
+                return @"Division by zero.";
         } else if ([operation isEqualToString:@"sqrt"]) {
-            double argument = [self popOperandOffProgramStack:stack];
-            result = sqrt(argument);
+            double argument;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                argument = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            if (argument>=0)
+                result = [NSNumber numberWithDouble:sqrt(argument)];
+            else 
+                result = @"Square root of negative number.";
         } else if ([operation isEqualToString:@"sin"]) {
-            double argument = [self popOperandOffProgramStack:stack];
-            result = sin(argument);
+            double argument;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                argument = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            result = [NSNumber numberWithDouble:sin(argument)];
         } else if ([operation isEqualToString:@"cos"]) {
-            double argument = [self popOperandOffProgramStack:stack];
-            result = cos(argument);
+            double argument;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                argument = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            result = [NSNumber numberWithDouble:cos(argument)];
         } else if ([operation isEqualToString:@"pi"])
-            result = M_PI;
-        else if ([operation isEqualToString:@"+/-"])
-            result = -[self popOperandOffProgramStack:stack];
+            result = [NSNumber numberWithDouble: M_PI];
+        else if ([operation isEqualToString:@"+/-"]) {
+            double argument;
+            
+            id arg1 = [self popOperandOffProgramStack:stack];
+            
+            if ([arg1 isKindOfClass:[NSNumber class]])
+                argument = [arg1 doubleValue];
+            else
+                return arg1;
+            
+            result = [NSNumber numberWithDouble:-argument];
+        }
     }
     
     return result;
 }
 
-+ (double)runProgram:(id)program
++ (id)runProgram:(id)program
 {
     NSMutableArray *stack;
     
     if ([program isKindOfClass:[NSArray class]]) 
         stack = [program mutableCopy];
         
-    return [self popOperandOffProgramStack:stack];
+    id result = [self popOperandOffProgramStack:stack];
+    
+    if (result)
+        return result;
+    else
+        return @"Not enough arguments.";
 }
 
-+ (double)runProgram:(id)program 
++ (id)runProgram:(id)program 
  usingVariableValues:(NSDictionary *)variableValues
 {
     
-    if ((program == nil) || (variableValues == nil))
-        return 0.0;
+    if (program == nil)
+        return @"No program defined.";
+    
+    if (variableValues == nil)
+        return @"No variables defined.";
     
     NSSet *usedVariables = [self variablesUsedInProgram:program];
     
@@ -247,7 +354,12 @@
                                                                    
     }
        
-    return [self runProgram:programWithNumbers];
+    id result = [self runProgram:programWithNumbers];
+    
+    if (result)
+        return result;
+    else
+        return @"Not enough arguments.";
     
 }
 
